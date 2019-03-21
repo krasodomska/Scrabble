@@ -10,14 +10,23 @@ public class Player {
     private int howManyLetterOnStart = 8;
 
 
-    //czy w linked List jest zachowana kolejność???
+
     //mam problem jak ująć kwetię innych słów, które tworzą się przypadkiem
-    public void addWord(String word, int[] position, Direction.Diretions direction){
+    public void addWord(String word, int[] position, Direction direction){
         Word wordToList = new Word();
         wordToList.score = Board.addWord(word, position, direction);
         wordToList.word = (direction.down)?Board.getFullWordDown(position):Board.getFullWordAcross(position);
-        score += wordToList.score;
-        wordsList.add(wordToList);
+        if (Dictionary.wordExist(wordToList.word)){
+            System.out.println("exist");
+            score += wordToList.score;
+            wordsList.add(wordToList);
+            Board.checkedLetterBoard = Board.letterBoard;
+        }
+        else {
+            Board.letterBoard = Board.checkedLetterBoard;
+            System.out.println("not");
+        }
+        Board.showBoard(Board.letterBoard);
     }
 
     public void startWithRandomLetter (){

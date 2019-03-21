@@ -14,19 +14,20 @@ public class MyGdxGame extends ApplicationAdapter {
 	Texture img;
 	Player playerI = new Player();
 	Player playerII = new Player();
-	Direction.Diretions down= Direction.Diretions.DOWN;
-	Direction.Diretions across= Direction.Diretions.ACROSS;
+	Direction down= Direction.DOWN;
+	Direction across= Direction.ACROSS;
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
 
 		try {
-
+            Dictionary.createDictionary();
 			LetterBag.createBag();
 			Board.crateBoards();
 			int[] position = {0,0};
-			playerI.addWord("doggie", position, across);
+			playerI.addWord("doggos", position, across);
+			playerI.addWord("doggy", position, across);
 
 			position[1] = 2;
 			playerII.addWord("lass", position, down);
@@ -43,7 +44,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			System.out.println("Player II score:"+ playerII.score);
 			playerII.showMyWord();
-			Dictionary.createDictionary();
+
 //			playerI.getWordScore("AGA");
 //            LetterBag.letterExchange(forTesting);
 

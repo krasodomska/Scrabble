@@ -1,12 +1,11 @@
 package com.mygdx.game.system;
-public class Direction {
-    public enum Diretions {
-        DOWN(true),
-        ACROSS(false);
-        boolean down;
 
-        Diretions(boolean isDown) {
-            down = isDown;
-        }
+public enum Direction {
+    DOWN(true),
+    ACROSS(false);
+    public boolean down;
+
+    Direction(boolean isDown) {
+        down = isDown;
     }
 }

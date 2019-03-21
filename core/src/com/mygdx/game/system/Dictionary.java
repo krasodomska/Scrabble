@@ -1,10 +1,5 @@
 package com.mygdx.game.system;
 
-import com.google.gwt.thirdparty.guava.common.collect.ArrayListMultimap;
-import com.google.gwt.thirdparty.guava.common.collect.HashMultimap;
-import com.google.gwt.thirdparty.guava.common.collect.ListMultimap;
-import com.google.gwt.thirdparty.guava.common.collect.Multimap;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,10 +7,9 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class Dictionary {
-    //wczytaj słowa z pliku na literę a i wrzuć do setu A itd
-    static Map byLetter = new HashMap<Character, HashMap<Integer,Set<String>>>();
-    static Map byWordLength = new HashMap<Integer, Set<String>>();
-    static Set words = new HashSet<String>();
+    static Map<Character, Map<Integer,Set<String>>> byLetter = new HashMap<>();
+
+
 
     public static void createDictionary() throws Exception {
         File file = new File("core/assets/Dictionary");
@@ -26,26 +20,30 @@ public class Dictionary {
     }
 
     private static void addToSet(String word) {
-        Character firstLetter = Character.valueOf(word.charAt(0));
-        Integer wordLen = Integer.valueOf(word.length());
-        if (byLetter.containsKey(firstLetter)){
-            byWordLength = (Map) byLetter.get(firstLetter);
-            if (byWordLength.containsKey(wordLen)){
-                words = (Set) byWordLength.get(wordLen);
+        Character firstLetter = word.charAt(0);
+        Integer wordLen = word.length();
+        Set wordSet = new HashSet<String>();
+        Map<Integer,Set<String>> byWordLength = new HashMap<>();
+        if (byLetter.containsKey(firstLetter)) {
+            if (byLetter.get(firstLetter).containsKey(wordLen)) {
+                byLetter.get(firstLetter).get(wordLen).add(word);
             }
-
+            else{
+                wordSet.add(word);
+                byLetter.get(firstLetter).put(wordLen, wordSet);
+            }
+        }
+        else {
+            wordSet.add(word);
+            byWordLength.put(wordLen, wordSet);
+            byLetter.put(firstLetter,byWordLength);
         }
 
-        words.add(word);
-        byWordLength.put(wordLen, words);
-        Set test = new HashSet<String>();
-        if(byWordLength.containsKey(Integer.valueOf(3))){
-            test = (Set) byWordLength.get(3);
-        }
-        test.forEach(x ->System.out.println(x));
-        byLetter.put(firstLetter, byWordLength);
+    }
 
-        words.removeAll(words);
-
+    public static boolean wordExist(String word){
+        Character firstLetter = word.charAt(0);
+        Integer wordLen = word.length();
+        return byLetter.get(firstLetter).get(wordLen).contains(word);
     }
 }

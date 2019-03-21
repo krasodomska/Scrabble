@@ -6,8 +6,6 @@ import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
 public class Board {
     public static String[][] baseBoard;
     public static String[][] letterBoard;
@@ -35,9 +33,6 @@ public class Board {
                             createBonusPlaceMap(tab[0]);
                         }
                 );
-        showBoard(baseBoard);
-        //System.out.println(bonusPlace);
-        //showBoard(letterBoard);
     }
 
     private static void fillBoard(String[][] board) {
@@ -48,7 +43,7 @@ public class Board {
         }
     }
 
-    private static void showBoard(String[][] board) {
+    public static void showBoard(String[][] board) {
         String showedLine = "";
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -66,42 +61,37 @@ public class Board {
         }
     }
 
-    public static int addWord(String word, int[] startPos, Direction.Diretions direction) {
+    public static int addWord(String word, int[] startPos, Direction direction) {
         int score = 0;
         int wordBonus = 1;
         String placeInBaseBoard = "";
-        for (int i = 0, index = 0, j = 0; index < word.length() && startPos[0] + i < 15 && startPos[1] + j <15; ) {
-            if (letterBoard[startPos[0] + i][startPos[1]+j].equals("*")) {
-                letterBoard[startPos[0] + i][startPos[1]+j] = String.valueOf(word.charAt(index));
+        for (int i = 0, index = 0, j = 0; index < word.length() && startPos[0] + i < 15 && startPos[1] + j < 15; ) {
+            if (letterBoard[startPos[0] + i][startPos[1] + j].equals("*")) {
+                letterBoard[startPos[0] + i][startPos[1] + j] = String.valueOf(word.charAt(index));
 
-                placeInBaseBoard = baseBoard[startPos[0] + i][startPos[1]+j];
+                placeInBaseBoard = baseBoard[startPos[0] + i][startPos[1] + j];
                 wordBonus = getWordBonus(placeInBaseBoard, wordBonus);
-
 
                 score += LetterBag.pointTable.get(String.valueOf(word.charAt(index))) * getLetterBonus(placeInBaseBoard);
                 ++index;
             }
-            //I have no idea how to pack it in for loop and shorted version doesn't work
-            if ((direction.down)) {
-                ++i;
-            } else {
-                ++j;
-            }
+            if (direction.down) i++;
+            else j++;
         }
-        score += (direction.down)? Word.getWordScore(getFullWordDown(startPos)):Word.getWordScore(getFullWordAcross(startPos)) - Word.getWordScore(word);
+        score += (direction.down) ? Word.getWordScore(getFullWordDown(startPos)) : Word.getWordScore(getFullWordAcross(startPos)) - Word.getWordScore(word);
         score *= wordBonus;
 
-        showBoard(letterBoard);
         return score;
     }
-    private static int getLetterBonus(String placeInBaseBoard){
+
+    private static int getLetterBonus(String placeInBaseBoard) {
         if (placeInBaseBoard.length() > 1 && placeInBaseBoard.charAt(1) == "l".charAt(0)) {
             return bonusPlace.get(placeInBaseBoard);
         }
         return 1;
     }
 
-    private static int getWordBonus(String placeInBaseBoard, int wordBonus){
+    private static int getWordBonus(String placeInBaseBoard, int wordBonus) {
         if (placeInBaseBoard.length() > 1 && placeInBaseBoard.charAt(1) == "w".charAt(0)) {
             return Math.max(wordBonus, bonusPlace.get(placeInBaseBoard));
         }
