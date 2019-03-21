@@ -4,25 +4,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class Dictionary {
     static Map<Character, Map<Integer,Set<String>>> byLetter = new HashMap<>();
-
-
 
     public static void createDictionary() throws Exception {
         File file = new File("core/assets/Dictionary");
         BufferedReader dictionaryBuffer = new BufferedReader(new FileReader(file));
 
         dictionaryBuffer.lines()
-                .forEach(word->addToSet(word));
+                .forEach(Dictionary::addToSet);
     }
 
     private static void addToSet(String word) {
         Character firstLetter = word.charAt(0);
         Integer wordLen = word.length();
-        Set wordSet = new HashSet<String>();
+        Set<String> wordSet = new HashSet<>();
         Map<Integer,Set<String>> byWordLength = new HashMap<>();
         if (byLetter.containsKey(firstLetter)) {
             if (byLetter.get(firstLetter).containsKey(wordLen)) {

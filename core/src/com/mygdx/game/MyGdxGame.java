@@ -36,14 +36,21 @@ public class MyGdxGame extends ApplicationAdapter {
 			playerI.addWord("treet",position, across);
 
 			position[1] = 7;
-			System.out.println(" ");
 			playerII.addWord("ee", position, down);
 
+			position[0] = 6;
+            System.out.println(" ");
+
+            playerII.addWord("sun", position, across);
+            Board.showBoard(Board.letterBoard);
 			System.out.println("Player I score:" + playerI.score);
 			playerI.showMyWord();
 
 			System.out.println("Player II score:"+ playerII.score);
 			playerII.showMyWord();
+
+
+
 
 //			playerI.getWordScore("AGA");
 //            LetterBag.letterExchange(forTesting);

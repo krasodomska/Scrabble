@@ -3,8 +3,7 @@ package com.mygdx.game.system;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Board {
     public static String[][] baseBoard;
@@ -26,6 +25,7 @@ public class Board {
         baseBoard = new String[Integer.parseInt(boardDimension[0])][Integer.parseInt(boardDimension[1])];
         fillBoard(baseBoard);
 
+
         boardDataBuffer.lines()
                 .map(line -> line.split(" "))
                 .forEach(tab -> {
@@ -33,6 +33,7 @@ public class Board {
                             createBonusPlaceMap(tab[0]);
                         }
                 );
+        showBoard(baseBoard);
     }
 
     private static void fillBoard(String[][] board) {
@@ -61,48 +62,81 @@ public class Board {
         }
     }
 
-    public static int addWord(String word, int[] startPos, Direction direction) {
-        int score = 0;
-        int wordBonus = 1;
-        String placeInBaseBoard = "";
-        for (int i = 0, index = 0, j = 0; index < word.length() && startPos[0] + i < 15 && startPos[1] + j < 15; ) {
+    public static Turn addWord(String myWord, int[] startPos, Direction direction) {
+        Turn word = new Turn();
+        for (int i = 0, index = 0, j = 0; index < myWord.length() && startPos[0] + i < 15 && startPos[1] + j < 15; ) {
             if (letterBoard[startPos[0] + i][startPos[1] + j].equals("*")) {
-                letterBoard[startPos[0] + i][startPos[1] + j] = String.valueOf(word.charAt(index));
+                letterBoard[startPos[0] + i][startPos[1] + j] = String.valueOf(myWord.charAt(index));
 
-                placeInBaseBoard = baseBoard[startPos[0] + i][startPos[1] + j];
-                wordBonus = getWordBonus(placeInBaseBoard, wordBonus);
-
-                score += LetterBag.pointTable.get(String.valueOf(word.charAt(index))) * getLetterBonus(placeInBaseBoard);
+                addLetterToWord(String.valueOf(myWord.charAt(index)), startPos[0] + i, startPos[1] + j, word);
                 ++index;
             }
             if (direction.down) i++;
             else j++;
         }
-        score += (direction.down) ? Word.getWordScore(getFullWordDown(startPos)) : Word.getWordScore(getFullWordAcross(startPos)) - Word.getWordScore(word);
-        score *= wordBonus;
-
-        return score;
+        return word;
     }
 
-    private static int getLetterBonus(String placeInBaseBoard) {
+    private static Turn addLetterToWord(String myLetter, int x, int y, Turn word){
+        LetterOnBoard letter = new LetterOnBoard();
+        letter.letter = myLetter;
+        letter.position[0] = x;
+        letter.position[1] = y;
+        word.letterInWord.add(letter);
+        return word;
+    }
+
+    public static int getLetterBonus(int[] position) {
+        String placeInBaseBoard = baseBoard[position[0]][position[1]];
         if (placeInBaseBoard.length() > 1 && placeInBaseBoard.charAt(1) == "l".charAt(0)) {
             return bonusPlace.get(placeInBaseBoard);
         }
         return 1;
     }
 
-    private static int getWordBonus(String placeInBaseBoard, int wordBonus) {
+    public static int getWordBonus(int[] position, int wordBonus) {
+        String placeInBaseBoard = baseBoard[position[0]][position[1]];
         if (placeInBaseBoard.length() > 1 && placeInBaseBoard.charAt(1) == "w".charAt(0)) {
             return Math.max(wordBonus, bonusPlace.get(placeInBaseBoard));
         }
         return Math.max(wordBonus, 1);
     }
 
-    public static String getFullWordAcross(int[] position) {
+    public static String getFullWord(int[] position, boolean down) {
         //position = {y, x} letterBoard[y][x]
         //to find start position
-        int x = 0;
+        int x = getBeginAcross(position);
+        int y = getBeginDown(position);
         String word = "";
+        if (down) {
+            word = fullWordDown(position[1], y);
+        } else {
+            word = fullWordAcross(x, position[0]);
+        }
+        return word;
+    }
+
+    private static String fullWordAcross(int x, int y) {
+        String word = "";
+        while (x < 15 && letterBoard[y][x] != "*") {
+            word += letterBoard[y][x];
+            ++x;
+        }
+        return word;
+    }
+
+    private static String fullWordDown(int x, int y) {
+        String word = "";
+        while (y < 15 && letterBoard[y][x] != "*") {
+            word += letterBoard[y][x];
+            ++y;
+        }
+        return word;
+
+    }
+
+    private static int getBeginAcross(int[] position) {
+        int x = 0;
         for (int i = position[1]; i >= 0; i--) {
             x = i;
             if (letterBoard[position[0]][i] == "*") {
@@ -110,18 +144,11 @@ public class Board {
                 break;
             }
         }
-        while (x < 15 && letterBoard[position[0]][x] != "*") {
-            word += letterBoard[position[0]][x];
-            ++x;
-        }
-        return word;
+        return x;
     }
 
-    public static String getFullWordDown(int[] position) {
-        //position = {y, x} letterBoard[y][x]
-        //to find start position
+    private static int getBeginDown(int[] position) {
         int y = 0;
-        String word = "";
         for (int i = position[0]; i >= 0; i--) {
             y = i;
             if (letterBoard[i][position[1]] == "*") {
@@ -129,11 +156,6 @@ public class Board {
                 break;
             }
         }
-        while (y < 15 && letterBoard[y][position[1]] != "*") {
-            word += letterBoard[y][position[1]];
-            ++y;
-        }
-        return word;
+        return y;
     }
-
 }
